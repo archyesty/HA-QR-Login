@@ -26,6 +26,7 @@ class Session:
     target_name: str | None = None
     delivered: bool = False
     peer_ip: str | None = None
+    origin: str | None = None
 
 
 @dataclass
@@ -38,13 +39,13 @@ class SessionStore:
         for code in [c for c, s in self._sessions.items() if now - s.created > self.ttl]:
             self._sessions.pop(code, None)
 
-    def create(self, peer_ip: str | None) -> Session | None:
+    def create(self, peer_ip: str | None, origin: str | None = None) -> Session | None:
         self._purge()
         if len(self._sessions) >= MAX_PENDING:
             return None
         code = secrets.token_urlsafe(16)  # 128-bit
         display = code[-6:].upper().replace("_", "X").replace("-", "Z")
-        session = Session(code=code, display=display, created=time.time(), peer_ip=peer_ip)
+        session = Session(code=code, display=display, created=time.time(), peer_ip=peer_ip, origin=origin)
         self._sessions[code] = session
         return session
 

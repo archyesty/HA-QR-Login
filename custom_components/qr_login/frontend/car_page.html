@@ -27,7 +27,7 @@ let code=null, timer=null, poller=null;
 async function start(){
   document.getElementById('retry').style.display='none';
   document.getElementById('qr').innerHTML='';
-  const r = await fetch('/api/qr_login/start',{method:'POST'});
+  const r = await fetch('/api/qr_login/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({origin:location.origin})});
   if(!r.ok){ setStatus('Busy — try again in a minute'); showRetry(); return; }
   const d = await r.json();
   code = d.code;

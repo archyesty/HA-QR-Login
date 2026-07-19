@@ -51,7 +51,19 @@ class StartView(HomeAssistantView):
             return self.json({"error": "rate_limited"}, status_code=429)
         hass: HomeAssistant = request.app["hass"]
         store: SessionStore = hass.data[DOMAIN]["store"]
-        session = store.create(request.remote)
+        origin = None
+        try:
+            body = await request.json()
+            candidate = str(body.get("origin", ""))
+            if (
+                candidate.startswith(("http://", "https://"))
+                and len(candidate) < 200
+                and " " not in candidate
+            ):
+                origin = candidate.rstrip("/")
+        except Exception:  # noqa: BLE001 - no body is fine
+            pass
+        session = store.create(request.remote, origin)
         if session is None:
             return self.json({"error": "busy"}, status_code=503)
         return self.json({"code": session.code, "display": session.display, "ttl": store.ttl})

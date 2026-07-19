@@ -60,7 +60,10 @@ def ws_session_info(hass: HomeAssistant, connection, msg: dict[str, Any]) -> Non
     if session is None:
         connection.send_error(msg["id"], "not_found", "Code expired or unknown")
         return
-    connection.send_result(msg["id"], {"display": session.display, "status": session.status})
+    connection.send_result(
+        msg["id"],
+        {"display": session.display, "status": session.status, "origin": session.origin},
+    )
 
 
 @websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/list_users"})
@@ -118,7 +121,14 @@ async def ws_approve(hass: HomeAssistant, connection, msg: dict[str, Any]) -> No
         return
 
     # Mint fresh credentials for the target, at this moment.
-    base_url = str(hass.config.external_url or hass.config.internal_url or "").rstrip("/")
+    # The token's client_id must match the URL the DEVICE is using, or the
+    # frontend's 30-minute token refresh fails. Prefer the origin the car
+    # page reported (works for homeassistant.local, LAN IP, or external
+    # domain alike); fall back to configured URLs only if it's missing.
+    base_url = (
+        session.origin
+        or str(hass.config.external_url or hass.config.internal_url or "").rstrip("/")
+    )
     client_id = f"{base_url}/" if base_url else None
     refresh = await hass.auth.async_create_refresh_token(
         target,

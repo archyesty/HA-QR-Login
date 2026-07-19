@@ -51,6 +51,7 @@ class QrApprovePanel extends HTMLElement {
       <h2>Approve sign-in?</h2>
       <p class="hint">Only approve if YOU just opened this on the device, and the code below matches its screen:</p>
       <div class="display">${info.display}</div>
+      ${info.origin ? `<p class="hint" style="text-align:center">Device at: <b>${info.origin}</b></p>` : ""}
       <label class="hint">Sign the device in as:</label>
       <select id="target">${opts}</select>
       <div id="crosswarn" class="warn" style="display:none">Signing in a different user — that device will have their access.</div>
