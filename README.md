@@ -1,3 +1,5 @@
+<p align="center"><img src="images/icon@2x.png" width="140" alt="QR Login"></p>
+
 # QR Login for Home Assistant
 
 Log in to Home Assistant on a device that's hard to type on, like a car

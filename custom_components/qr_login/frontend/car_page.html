@@ -31,7 +31,7 @@ async function start(){
   if(!r.ok){ setStatus('Busy — try again in a minute'); showRetry(); return; }
   const d = await r.json();
   code = d.code;
-  const link = location.origin + '/qr-approve?code=' + encodeURIComponent(code);
+  const link = location.origin + '/qr-approve/' + encodeURIComponent(code);
   new QRCode(document.getElementById('qr'), {text:link, width:280, height:280, correctLevel:QRCode.CorrectLevel.M});
   document.getElementById('display').textContent = d.display;
   setStatus("Verify the code matches on your phone, then approve");

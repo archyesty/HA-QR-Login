@@ -10,7 +10,12 @@ class QrApprovePanel extends HTMLElement {
 
   async _init() {
     this._rendered = true;
-    this._code = new URLSearchParams(window.location.search).get("code");
+    // Code travels in the path (/qr-approve/CODE) because the HA frontend
+    // router reliably preserves paths but can strip query strings on load.
+    const pathMatch = window.location.pathname.match(/qr-approve\/([^\/?#]+)/);
+    this._code = pathMatch
+      ? decodeURIComponent(pathMatch[1])
+      : new URLSearchParams(window.location.search).get("code");
     this.attachShadow({ mode: "open" });
     this.shadowRoot.innerHTML = `
       <style>
