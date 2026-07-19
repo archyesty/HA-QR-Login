@@ -17,6 +17,8 @@ from .const import (
     DOMAIN,
 )
 
+DOCS_URL = "https://github.com/archyesty/HA-QR-Login"
+
 
 class QRLoginConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
@@ -26,7 +28,12 @@ class QRLoginConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
         if user_input is not None:
             return self.async_create_entry(title="QR Login", data={})
-        return self.async_show_form(step_id="user")
+        return self.async_show_form(
+            step_id="user",
+            description_placeholders={
+                "docs": f"[Documentation & security model]({DOCS_URL})"
+            },
+        )
 
     @staticmethod
     @callback
@@ -54,6 +61,7 @@ class QRLoginOptionsFlow(OptionsFlow):
 
         return self.async_show_form(
             step_id="init",
+            description_placeholders={"docs": f"[Documentation]({DOCS_URL})"},
             data_schema=vol.Schema(
                 {
                     vol.Required(

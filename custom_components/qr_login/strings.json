@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "QR Login",
-        "description": "Set up QR-based device login. A device opens `/qr-login`, you scan the QR with a signed-in phone and approve.\n\n📖 [Documentation & security model](https://github.com/archyesty/HA-QR-Login)"
+        "description": "Set up QR-based device login. A device opens `/qr-login`, you scan the QR with a signed-in phone and approve.\n\n📖 {docs}"
       }
     },
     "abort": {
@@ -14,7 +14,7 @@
     "step": {
       "init": {
         "title": "QR Login",
-        "description": "Administrators can always approve logins. Non-admin users cannot approve anything — not even for themselves — unless you allowlist them below.\n\n📖 [Documentation](https://github.com/archyesty/HA-QR-Login)",
+        "description": "Administrators can always approve logins. Non-admin users cannot approve anything — not even for themselves — unless you allowlist them below.\n\n📖 {docs}",
         "data": {
           "code_ttl": "Code lifetime (seconds)",
           "allow_cross_user": "Allow admins to sign a device in as another user",
