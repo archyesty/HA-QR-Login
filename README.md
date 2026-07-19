@@ -15,8 +15,8 @@ a modern browser.
 
 - No tokens or secrets are stored ahead of time. A token is only created
   the moment someone approves the login, and it's handed to the device once.
-- Codes are random, single use, and expire after 60 seconds (you can set
-  this anywhere from 30 to 300).
+- Codes are random, single use, and expire after 2 minutes (you can set
+  this anywhere from 30 to 300 seconds).
 - Approval goes over Home Assistant's authenticated connection, so the
   approver is whoever is actually signed in on the phone. It can't be faked.
 - Admins can always approve. A regular user can't approve anything, even
