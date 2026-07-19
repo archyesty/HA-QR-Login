@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": { "user": { "title": "QR Login", "description": "Set up QR-based device login. Make sure your external URL is configured and served over HTTPS." } },
+    "abort": { "already_configured": "Already configured" }
+  },
+  "options": {
+    "step": { "init": {
+      "title": "QR Login",
+      "description": "Administrators can always approve logins. Non-admin users cannot approve anything — not even for themselves — unless you allowlist them below.",
+      "data": {
+        "code_ttl": "Code lifetime (seconds)",
+        "allow_cross_user": "Allow admins to sign a device in as another user",
+        "allowed_users": "Non-admin users allowed to approve (self only)"
+      }
+    } }
+  }
+}

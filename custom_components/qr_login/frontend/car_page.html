@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Login</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  body { margin:0; font-family:-apple-system,Roboto,sans-serif; background:#111318; color:#e8eaed;
+         display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:24px; }
+  #qr { background:#fff; padding:16px; border-radius:12px; }
+  #display { font-size:2.2rem; letter-spacing:.35em; font-weight:700; }
+  #status { color:#9aa0a6; font-size:1.1rem; min-height:1.4em; text-align:center; padding:0 24px; }
+  #countdown { color:#9aa0a6; font-variant-numeric:tabular-nums; }
+  button { font-size:1.2rem; padding:12px 32px; border-radius:8px; border:none; background:#3d5afe; color:#fff; display:none; }
+</style>
+</head>
+<body>
+  <div id="qr"></div>
+  <div id="display"></div>
+  <div id="status">Scan with a phone that's signed in to Home Assistant</div>
+  <div id="countdown"></div>
+  <button id="retry" onclick="start()">New code</button>
+<script>
+let code=null, timer=null, poller=null;
+
+async function start(){
+  document.getElementById('retry').style.display='none';
+  document.getElementById('qr').innerHTML='';
+  const r = await fetch('/api/qr_login/start',{method:'POST'});
+  if(!r.ok){ setStatus('Busy — try again in a minute'); showRetry(); return; }
+  const d = await r.json();
+  code = d.code;
+  const link = location.origin + '/qr-approve?code=' + encodeURIComponent(code);
+  new QRCode(document.getElementById('qr'), {text:link, width:280, height:280, correctLevel:QRCode.CorrectLevel.M});
+  document.getElementById('display').textContent = d.display;
+  setStatus("Verify the code matches on your phone, then approve");
+  let left = d.ttl;
+  clearInterval(timer);
+  timer = setInterval(()=>{ left--; document.getElementById('countdown').textContent = left+'s';
+    if(left<=0){ expire(); } }, 1000);
+  clearInterval(poller);
+  poller = setInterval(poll, 2000);
+}
+
+async function poll(){
+  const r = await fetch('/api/qr_login/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+  if(!r.ok) return;
+  const d = await r.json();
+  if(d.status==='approved'){ finish(d.tokens); }
+  else if(d.status==='denied'){ stop(); setStatus('Denied on phone'); showRetry(); }
+  else if(d.status==='expired'){ expire(); }
+}
+
+function finish(t){
+  stop();
+  setStatus('Approved — signing in…');
+  const now = Date.now();
+  localStorage.setItem('hassTokens', JSON.stringify({
+    access_token:t.access_token, refresh_token:t.refresh_token, token_type:t.token_type,
+    expires_in:t.expires_in, expires: now + t.expires_in*1000,
+    hassUrl: t.hassUrl || location.origin, clientId: t.clientId || (location.origin+'/')
+  }));
+  location.replace('/');
+}
+
+function expire(){ stop(); setStatus('Code expired'); showRetry(); document.getElementById('countdown').textContent=''; }
+function stop(){ clearInterval(timer); clearInterval(poller); }
+function setStatus(s){ document.getElementById('status').textContent=s; }
+function showRetry(){ document.getElementById('retry').style.display='block'; }
+start();
+</script>
+</body>
+</html>
