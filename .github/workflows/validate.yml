@@ -26,7 +26,3 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
-          # TODO: remove the `ignore: brands` line once the
-          # home-assistant/brands PR ("Add qr_login") is merged, so the
-          # brand images are validated against the default store.
-          ignore: brands
